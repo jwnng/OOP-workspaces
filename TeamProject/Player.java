@@ -1,5 +1,4 @@
 // --- 필요한 라이브러리/클래스들을 가져옵니다. ---
-#include "Collision.h"
 import java.awt.Image; 
 // Image 클래스를 가져옵니다. 
 // 주인공 캐릭터의 이미지(사진 에셋) 데이터를 저장하고 다루기 위해 필요합니다.
@@ -7,6 +6,7 @@ import java.awt.Image;
 import java.awt.event.KeyEvent;
 // KeyEvent 클래스를 가져옵니다. 
 // 키보드 입력(예: 방향키)을 감지하고, 해당 키보드 입력의 고유한 정수 코드(KeyCode)를 사용하기 위해 필요합니다.
+import Collision; // ✅ 방금 만든 Collision.java를 불러옴
 
 public class Player { // 주인공(플레이어) 객체의 상태와 행동을 정의하는 클래스
 	
@@ -59,5 +59,11 @@ public class Player { // 주인공(플레이어) 객체의 상태와 행동을 �
 			break;
 		// 다른 키 입력은 무시 (별도 동작 없음)
 		}
+		// 벽 충돌 검사
+        if (!Collision.checkWallCollision(nextX, nextY, tileMap, SIZE)) {
+            x = nextX;
+            y = nextY;
+		}
+		// else: 벽이면 움직이지 않음
 	}
 }
