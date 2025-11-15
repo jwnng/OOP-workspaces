@@ -7,7 +7,8 @@ import java.awt.event.KeyEvent; // KeyEvent 클래스: 키보드 이벤트(키 �
 import java.awt.event.KeyListener; // KeyListener 인터페이스: 키보드 입력을 처리하는 메서드를 구현하기 위해 필요합니다.
 import java.io.File;        // File 클래스: 이미지 파일의 경로를 지정하고 파일을 다루기 위해 필요합니다.
 import java.io.IOException;   // IOException 클래스: 파일 입출력 과정(이미지 로드)에서 발생할 수 있는 예외 처리를 위해 필요합니다.
- 
+import java.awt.image.BufferedImage;
+
 public class GamePanel extends JPanel implements KeyListener { // 게임의 메인 화면이자 로직을 담당하는 패널 클래스
 	
 	// --- 필드(멤버 변수) ---
@@ -24,12 +25,23 @@ public class GamePanel extends JPanel implements KeyListener { // 게임의 메�
 			{1, 1, 1, 1, 1, 1, 1, 1, 1, 1}
 	};
 	private Player player; // 주인공 Player 객체를 저장할 변수 선언
+	private BufferedImage background; // ✅ 배경 이미지 필드 추가
 	
 	// --- 생성자 ---
 	public GamePanel() {
 		this.setFocusable(true); // 이 패널이 키 입력을 받을 수 있도록 포커스를 설정
 		this.addKeyListener(this); // 이 패널에 키 입력 리스너(자신)를 등록
 		loadAssets(); // 게임에 필요한 이미지 에셋을 로드하는 메서드 호출
+		loadBackground(); // ✅ 배경 로드 메서드 호출
+	}
+	// --- 배경 이미지 로드 ---
+	private void loadBackground() {
+		try {
+			background = ImageIO.read(new File("assets/mansion_background1.png"));
+		} catch (IOException e) {
+			System.err.println("배경 이미지를 로드할 수 없습니다. 경로를 확인하세요.");
+			e.printStackTrace();
+		}
 	}
 	
 	// --- Getter 메서드: Main 클래스가 창 크기 계산을 위해 사용 ---
@@ -60,6 +72,10 @@ public class GamePanel extends JPanel implements KeyListener { // 게임의 메�
 	@Override
 	protected void paintComponent(Graphics g) {
 		super.paintComponent(g); // 부모 클래스의 paintComponent를 호출하여 화면 지우기
+		// ✅ 배경 먼저 그림
+		if (background != null) {
+			g.drawImage(background, 0, 0, getWidth(), getHeight(), null);
+		}
 		drawMaze(g); // 미로 맵을 그림
 		drawPlayer(g); // 플레이어 객체를 그림
 		Toolkit.getDefaultToolkit().sync(); // 화면 갱신 동기화 (화면 깜빡임 방지)
@@ -70,7 +86,7 @@ public class GamePanel extends JPanel implements KeyListener { // 게임의 메�
 		for (int row = 0; row < MAP.length; row++) {
 			for (int col = 0; col < MAP[0].length; col++) {
 				if (MAP[row][col] == 1) { // 맵 데이터가 1이면 벽
-					g.setColor(Color.DARK_GRAY); // 벽의 색상 설정
+					g.setColor(new Color(50, 50, 50, 180)); // 벽의 색상 설정
 					g.fillRect(col * TILE_SIZE, row * TILE_SIZE, TILE_SIZE, TILE_SIZE); // 벽 사각형 그리기
 				} else { // 맵 데이터가 0이면 길
 					g.setColor(Color.LIGHT_GRAY); // 길의 색상 설정
