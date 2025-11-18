@@ -6,7 +6,6 @@ import java.awt.Image;
 import java.awt.event.KeyEvent;
 // KeyEvent 클래스를 가져옵니다. 
 // 키보드 입력(예: 방향키)을 감지하고, 해당 키보드 입력의 고유한 정수 코드(KeyCode)를 사용하기 위해 필요합니다.
-import Collision; // ✅ 방금 만든 Collision.java를 불러옴
 
 public class Player { // 주인공(플레이어) 객체의 상태와 행동을 정의하는 클래스
 	
@@ -43,24 +42,25 @@ public class Player { // 주인공(플레이어) 객체의 상태와 행동을 �
 	 */
 	public void move(int KeyCode) {
 	    // GamePanel에서 충돌 체크를 진행하기 전에, 임시로 위치를 변경
+		int nextX = 0, nextY = 0;
 		switch(KeyCode) {	
 		// 미로 충돌 체크는 GamePanel에서 player.move() 호출 후 checkCollision()으로 확인
 		case KeyEvent.VK_UP: // ↑ (위) 키가 눌렸을 경우 (KeyEvent 클래스의 상수 사용)
-			y -= MOVE_SPEED; // Y 좌표를 MOVE_SPEED만큼 감소 (화면 상단으로 이동)
+			nextY -= y + MOVE_SPEED; // Y 좌표를 MOVE_SPEED만큼 감소 (화면 상단으로 이동)
 			break;
 		case KeyEvent.VK_DOWN: // ↓ (아래) 키가 눌렸을 경우
-			y += MOVE_SPEED; // Y 좌표를 MOVE_SPEED만큼 증가 (화면 하단으로 이동)
+			nextY += y + MOVE_SPEED; // Y 좌표를 MOVE_SPEED만큼 증가 (화면 하단으로 이동)
 			break;
 		case KeyEvent.VK_LEFT: // ← (왼쪽) 키가 눌렸을 경우
-			x -= MOVE_SPEED; // X 좌표를 MOVE_SPEED만큼 감소 (왼쪽으로 이동)
+			nextX -= x +MOVE_SPEED; // X 좌표를 MOVE_SPEED만큼 감소 (왼쪽으로 이동)
 			break;
 		case KeyEvent.VK_RIGHT: // → (오른쪽) 키가 눌렸을 경우
-			x += MOVE_SPEED; // X 좌표를 MOVE_SPEED만큼 증가 (오른쪽으로 이동)
+			nextX += x + MOVE_SPEED; // X 좌표를 MOVE_SPEED만큼 증가 (오른쪽으로 이동)
 			break;
 		// 다른 키 입력은 무시 (별도 동작 없음)
 		}
 		// 벽 충돌 검사
-        if (!Collision.checkWallCollision(nextX, nextY, tileMap, SIZE)) {
+        if (!Collision.checkWallCollision(nextX, nextY)) {
             x = nextX;
             y = nextY;
 		}
