@@ -1,5 +1,3 @@
-// --- 필요한 라이브러리/클래스들을 가져옵니다. ---
-
 import javax.swing.JFrame; 
 // JFrame 클래스를 가져옵니다. 
 // Java Swing GUI에서 최상위 창(Window) 역할을 하며, 게임 화면 전체를 담는 컨테이너입니다.
@@ -20,9 +18,9 @@ public class Main { // 프로그램의 시작점(Entry Point) 클래스
 		// 3. 창 크기 계산 및 설정
 		
 		// 창 크기 설정: GamePanel의 Getter 메서드를 사용하여 미로 크기에 맞게 계산
-		int width = gamePanel.getMapWidth() * gamePanel.getTileSize(); // 미로의 가로 타일 수 * 타일 크기로 가로 폭 계산
-		int height = gamePanel.getMapHeight() * gamePanel.getTileSize() + 25; // 미로의 세로 타일 수 * 타일 크기에 상단바 높이(약 25픽셀)를 더하여 세로 폭 계산
 		
+		int width = gamePanel.getMapWidth() * gamePanel.getTileSize(); 
+		int height = gamePanel.getMapHeight() * gamePanel.getTileSize() + 25;
 		frame.setSize(width, height); // 계산된 크기로 JFrame의 크기를 설정합니다.
 		
 		// 4. 창 속성 설정
