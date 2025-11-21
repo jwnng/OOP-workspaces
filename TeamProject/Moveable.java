@@ -1,4 +1,3 @@
-package project;
 public interface Moveable {
 	 	//위로 가는 기능
 		public abstract void up();
