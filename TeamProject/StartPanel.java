@@ -3,6 +3,8 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Image;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -22,7 +24,7 @@ public class StartPanel extends JPanel {
         // 폰트 설정 (없으면 기본 폰트)
         myCustomFont = new Font("Arial", Font.BOLD, 80);
 
-        JLabel titleLabel = new JLabel("대저택의 미로", JLabel.CENTER);
+        JLabel titleLabel = new JLabel("Mansion Maze", JLabel.CENTER);
         titleLabel.setFont(myCustomFont);
         titleLabel.setForeground(Color.WHITE);
         titleLabel.setBounds(0, 100, 1000, 150);
@@ -30,7 +32,8 @@ public class StartPanel extends JPanel {
 
         // 시작 버튼
         ImageIcon btnIcon = new ImageIcon("Images/Buttons/Play.png"); // 경로 수정
-        JButton startBtn = new JButton(btnIcon);
+        Image scaledImage = btnIcon.getImage().getScaledInstance(300, 120, Image.SCALE_SMOOTH);
+        JButton startBtn = new JButton(new ImageIcon(scaledImage));
         
         // 이미지가 없으면 글씨라도 나오게 처리
         if (btnIcon.getIconWidth() == -1) startBtn.setText("GAME START");
@@ -38,7 +41,7 @@ public class StartPanel extends JPanel {
         startBtn.setBorderPainted(false);
         startBtn.setContentAreaFilled(false);
         startBtn.setFocusPainted(false);
-        startBtn.setBounds(400, 400, 200, 80);
+        startBtn.setBounds(700, 580, 200, 80);
 
         startBtn.addActionListener(e -> {
             cardLayout.show(mainContainer, "GAME"); // 게임 화면으로 전환

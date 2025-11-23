@@ -4,8 +4,8 @@ import java.net.*;
 import javax.swing.*;
 
 public class ClientGUI extends JFrame {
-    private Bear bear;
-    private Rabbit rabbit;
+    private Dog dog;
+    private Girl girl;
     private MainMap mainMap;
     private JPanel m_map;
     private OptionPane oPane;
@@ -29,6 +29,7 @@ public class ClientGUI extends JFrame {
         setLocation(500,150);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setVisible(true);
+        setFocusable(true);//키 입력을 받기 위해 창 자체가 포커스를 받을 수 있게 설정
     }
 
     private void createDisplayPanel() {
@@ -40,17 +41,17 @@ public class ClientGUI extends JFrame {
         add(backgroundLabel);
 
         // 버튼 생성
-        JButton b_bear = new JButton("곰(P1) 하기");
-        b_bear.setBounds(100, 300, 200, 50);
+        JButton b_dog = new JButton("개(P1) 하기");
+        b_dog.setBounds(100, 300, 200, 50);
         
-        JButton b_rabbit = new JButton("토끼(P2) 하기");
-        b_rabbit.setBounds(400, 300, 200, 50);
+        JButton b_girl = new JButton("소녀(P2) 하기");
+        b_girl.setBounds(400, 300, 200, 50);
 
-        backgroundLabel.add(b_bear);
-        backgroundLabel.add(b_rabbit);
+        backgroundLabel.add(b_dog);
+        backgroundLabel.add(b_girl);
 
-        b_bear.addActionListener(e -> startGame("Bear"));
-        b_rabbit.addActionListener(e -> startGame("Rabbit"));
+        b_dog.addActionListener(e -> startGame("dog"));
+        b_girl.addActionListener(e -> startGame("girl"));
     }
 
     private void startGame(String selectedUid) {
@@ -64,17 +65,20 @@ public class ClientGUI extends JFrame {
         m_map = mainMap; 
 
         // 2. 캐릭터 생성 (파라미터 주의!)
-        bear = new Bear(mainMap, oPane);
-        rabbit = new Rabbit(mainMap, oPane);
+        dog = new Dog(mainMap, oPane);
+        girl = new Girl(mainMap, oPane);
 
         // 나머지는 그대로...
-        m_map.add(bear.getCharacter());
-        m_map.add(rabbit.getCharacter());
+        m_map.add(dog.getCharacter());
+        m_map.add(girl.getCharacter());
         add(m_map);
-
+        
+        //화면 갱신
+        revalidate();
+        repaint();
+        
         try {
-            // 내가 곰이면 토끼를 조종할 수 있는 권한(상대방 정보)을 연결, 반대면 곰을 연결
-            connectToServer(uid.equals("Bear") ? rabbit : bear);
+            connectToServer(uid.equals("dog") ? girl : dog);
         } catch (Exception e) { e.printStackTrace(); }
 
         setupKeyListener();
@@ -85,7 +89,7 @@ public class ClientGUI extends JFrame {
         addKeyListener(new KeyAdapter() {
             @Override
             public void keyPressed(KeyEvent e) {
-                Player myChar = uid.equals("Bear") ? bear : rabbit;
+                Player myChar = uid.equals("dog") ? dog : girl;
                 int key = e.getKeyCode();
                 
                 switch (key) {
@@ -101,7 +105,7 @@ public class ClientGUI extends JFrame {
 
             @Override
             public void keyReleased(KeyEvent e) {
-                Player myChar = uid.equals("Bear") ? bear : rabbit;
+                Player myChar = uid.equals("dog") ? dog : girl;
                 int key = e.getKeyCode();
                 
                 if (key == KeyEvent.VK_LEFT) {

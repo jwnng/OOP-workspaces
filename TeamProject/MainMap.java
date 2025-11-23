@@ -81,6 +81,10 @@ public class MainMap extends JPanel {
     public void gameOver(String reason) {
         main.triggerGameOver(reason);
     }
+    //성공 신호 보내기
+    public void success() {
+    	main.triggerSuccess();
+    }
 
     private void setupKeyListener() {
         addKeyListener(new KeyAdapter() {

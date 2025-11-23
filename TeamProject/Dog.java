@@ -1,9 +1,9 @@
 import java.awt.Image;
 import javax.swing.ImageIcon;
 
-public class Bear extends Player {
+public class Dog extends Player {
     
-    public Bear(MainMap m_map, OptionPane op) {
+    public Dog(MainMap m_map, OptionPane op) {
         super(m_map, 100, 100); // 시작 위치
     
         // 이미지 설정

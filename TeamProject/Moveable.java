@@ -1,6 +1,4 @@
 public interface Moveable {
-    // --- 이동 관련 (키 눌렀을 때) ---
-    
     // 위로 가는 기능
     public abstract void up();
     

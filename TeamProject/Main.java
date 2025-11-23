@@ -9,6 +9,7 @@ public class Main extends JFrame {
     // 우리가 만든 게임 화면 클래스 이름은 'MainMap'입니다.
     private MainMap mainMap; 
     private GameOverPanel gameOverPanel;
+    private SuccessPanel successPanel;
     private StartPanel startPanel;
 
     public Main() {
@@ -29,12 +30,15 @@ public class Main extends JFrame {
 
         // 3. 게임 오버 화면 생성
         gameOverPanel = new GameOverPanel(this);
+        
+        //성공 화면 생성
+        successPanel=new SuccessPanel(this);
 
         // 카드(화면) 담기
         mainContainer.add(startPanel, "START");
         mainContainer.add(mainMap, "GAME");
         mainContainer.add(gameOverPanel, "GAMEOVER");
-
+        mainContainer.add(successPanel, "SUCCESS");
         add(mainContainer);
 
         // 첫 화면은 START로 설정
@@ -44,11 +48,14 @@ public class Main extends JFrame {
 
     // 게임 오버가 되면 호출되는 함수
     public void triggerGameOver(String reason) {
-        gameOverPanel.setReason(reason); // 죽은 이유 설정
         cardLayout.show(mainContainer, "GAMEOVER"); // 게임 오버 화면 보여주기
         mainMap.stopGame(); // 게임 정지
     }
-
+    //게임 성공하면 호출되는 함수
+    public void triggerSuccess() {
+    	cardLayout.show(mainContainer, "SUCCESS");
+    	mainMap.stopGame();
+    }
     // 다시 시작 버튼을 누르면 호출되는 함수
     public void restartGame() {
         mainMap.resetGame(); // 게임 초기화
