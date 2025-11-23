@@ -1,30 +1,26 @@
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Graphics;
-import java.awt.Image;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
-import java.awt.Rectangle; //충돌 검사
-import javax.swing.ImageIcon;
-import javax.swing.JPanel;
-import javax.swing.Timer;
+import java.awt.*;
+import java.awt.event.*;
+import javax.swing.*;
 
 public class MainMap extends JPanel {
-    Main main; // 메인 프레임 참조
+    // ... (변수 선언 등 위쪽 코드는 그대로 유지) ...
+    Main main; 
     Player p1, p2;
-    Image wallImage, backgroundImage;
-    Timer gameLoop; //게임 상태를 계속 체크하는 타이머
+    Timer gameLoop; 
+    BgmLoop bgm; 
 
-    // 생성자 수정: Main을 받아옴
+    Image wallImage, backgroundImage;
+    Image trapGirl, trapDog; 
+    Image switchOff, switchOnLeft, switchOnRight, doorImg;
+
     public MainMap(Main main) {
         this.main = main;
         initMap();
     }
     public MainMap() {
-        initMap(); // Main 없이 맵만 초기화
+        initMap(); 
     }
 
-    // 맵 초기화 함수
     private void initMap() {
         int mapHeight = Collision.tileMap.length * Collision.TILE_SIZE;
         int mapWidth = Collision.tileMap[0].length * Collision.TILE_SIZE;
@@ -32,53 +28,69 @@ public class MainMap extends JPanel {
         setLayout(null);
         setBackground(Color.BLACK);
 
+        // 1. 이미지 로드
         wallImage = new ImageIcon("Images/Tile/WoodTile1.png").getImage();
         backgroundImage = new ImageIcon("Images/Background/Background.jpg").getImage();
+        trapGirl = new ImageIcon("Images/Tile/trap_fire.png").getImage();
+        trapDog = new ImageIcon("Images/Tile/trap_water.png").getImage();
+        switchOff = new ImageIcon("Images/Tile/Switch_off.png").getImage();       
+        switchOnLeft = new ImageIcon("Images/Tile/Switch_onleft.png").getImage();     
+        switchOnRight = new ImageIcon("Images/Tile/switch_onright.png").getImage();
+        doorImg = new ImageIcon("Images/Tile/door.png").getImage();
 
-        // 플레이어 생성
-        createPlayers();
-
+        createPlayers(); // 여기서 위치 설정
+        
         setFocusable(true);
         setupKeyListener();
-        startGameLoop();//둘이 만나는지 검사
+        startGameLoop();
+        
+        bgm = new BgmLoop("sound/main_bgm.wav");
+        bgm.start();
     }
- // 게임 루프 시작 함수
-    private void startGameLoop() {
-        if (gameLoop != null) gameLoop.stop(); // 기존 타이머가 있으면 정지
 
+    // ... (operateSwitch, startGameLoop, checkMeeting 등 중간 코드 유지) ...
+    public void operateSwitch(int switchX, int switchY, int targetDoorType, int finalState) {
+        Collision.tileMap[switchY][switchX] = finalState;
+        for(int row=0; row < Collision.tileMap.length; row++) {
+            for(int col=0; col < Collision.tileMap[0].length; col++) {
+                if(Collision.tileMap[row][col] == targetDoorType) {
+                    Collision.tileMap[row][col] = Collision.EMPTY; 
+                }
+            }
+        }
+        repaint(); 
+    }
+    
+    private void startGameLoop() {
+        if (gameLoop != null) gameLoop.stop(); 
         gameLoop = new Timer(30, e -> {
-        	if (p1 != null) p1.update();
+            if (p1 != null) p1.update();
             if (p2 != null) p2.update();
-            checkMeeting(); // 1. 둘이 만났는지 확인
-            repaint();      // 2. 화면 다시 그리기 (플레이어 이동 반영)
+            checkMeeting(); 
+            repaint();      
         });
         gameLoop.start();
     }
 
-    //핵심 기능: 두 플레이어가 만났는지 확인하는 함수
     private void checkMeeting() {
         if (p1 == null || p2 == null || p1.isDead || p2.isDead) return;
-
-        // p1과 p2의 위치와 크기(사각형)를 가져옴
-        // Player 클래스 안에 있는 character(JLabel)의 위치 정보를 이용
         Rectangle r1 = p1.character.getBounds();
         Rectangle r2 = p2.character.getBounds();
-
-        // 두 사각형이 겹치면(intersects) 만난 것!
-        if (r1.intersects(r2)) {
-            success(); // 성공 처리
-        }
+        if (r1.intersects(r2)) success(); 
     }
-    
+
+    // ⭐ [수정] 캐릭터 시작 위치 설정
     private void createPlayers() {
-        // 기존 플레이어가 있다면 제거 (재시작 시)
         if (p1 != null) remove(p1.character);
         if (p2 != null) remove(p2.character);
 
-        p1 = new Player(this, 100, 100);//플레이어 위치
+        // 1. 소녀 (왼쪽 상단)
+        p1 = new Player(this, 64, 64, 1); 
         setImage(p1, "Images/Girls/Girl_Idle.png");
 
-        p2 = new Player(this, 600, 500); //플레이어 위치
+        // 2. 강아지 (오른쪽 하단)
+        // 맵 크기가 30칸 x 20칸이므로, 대략 (28*32, 18*32) 위치
+        p2 = new Player(this, 850, 550, 2); 
         setImage(p2, "Images/Dog/Dog_Idle.png");
 
         p1.setOtherPlayer(p2);
@@ -95,28 +107,31 @@ public class MainMap extends JPanel {
         p.character.setSize(50, 50);
     }
 
-    // 게임 정지 (Player 클래스에 stop 메서드 필요)
+    // ... (나머지 하단 코드들 그대로 유지) ...
     public void stopGame() {
         if(p1 != null) p1.isDead = true;
         if(p2 != null) p2.isDead = true;
+        if (bgm != null) bgm.stopMusic();
     }
 
-    // 게임 리셋 (재시작)
     public void resetGame() {
-        stopGame(); // 일단 멈추고
-        createPlayers(); // 플레이어 다시 생성
+        stopGame(); 
+        createPlayers(); 
         repaint();
         requestFocus();
         startGameLoop();
+        bgm = new BgmLoop("sound/main_bgm.wav");
+        bgm.start();
     }
     
-    // 게임 오버 신호 보내기 (Player가 호출함)
     public void gameOver(String reason) {
-        main.triggerGameOver(reason);
+        if (bgm != null) bgm.stopMusic(); 
+        if (main != null) main.triggerGameOver(reason);
     }
-    //성공 신호 보내기
+    
     public void success() {
-    	main.triggerSuccess();
+        if (bgm != null) bgm.stopMusic(); 
+        if (main != null) main.triggerSuccess();
     }
 
     private void setupKeyListener() {
@@ -155,12 +170,29 @@ public class MainMap extends JPanel {
         super.paintComponent(g);
         if (backgroundImage != null) g.drawImage(backgroundImage, 0, 0, getWidth(), getHeight(), this);
         
-        int[][] mapData = Collision.tileMap;
-        int tileSize = Collision.TILE_SIZE;
-        for (int row = 0; row < mapData.length; row++) {
-            for (int col = 0; col < mapData[0].length; col++) {
-                if (mapData[row][col] == 1) {
-                    g.drawImage(wallImage, col * tileSize, row * tileSize, tileSize, tileSize, this);
+        int[][] map = Collision.tileMap;
+        int ts = Collision.TILE_SIZE;
+
+        for (int row = 0; row < map.length; row++) {
+            for (int col = 0; col < map[0].length; col++) {
+                int tile = map[row][col];
+                
+                if (tile == Collision.WALL) g.drawImage(wallImage, col*ts, row*ts, ts, ts, this);
+                else if (tile == Collision.PAD_GIRL) g.drawImage(trapGirl, col*ts, row*ts, ts, ts, this);
+                else if (tile == Collision.PAD_DOG) g.drawImage(trapDog, col*ts, row*ts, ts, ts, this);
+                
+                else if (tile == Collision.SWITCH_RED || tile == Collision.SWITCH_BLUE) {
+                    g.drawImage(switchOff, col*ts, row*ts, ts, ts, this);
+                }
+                else if (tile == Collision.SWITCH_ON_LEFT) { 
+                    g.drawImage(switchOnLeft, col*ts, row*ts, ts, ts, this);
+                }
+                else if (tile == Collision.SWITCH_ON_RIGHT) { 
+                    g.drawImage(switchOnRight, col*ts, row*ts, ts, ts, this);
+                }
+                
+                else if (tile == Collision.DOOR_RED || tile == Collision.DOOR_BLUE) {
+                    g.drawImage(doorImg, col*ts, row*ts, ts, ts, this);
                 }
             }
         }
