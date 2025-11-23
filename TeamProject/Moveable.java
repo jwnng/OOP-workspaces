@@ -11,8 +11,6 @@ public interface Moveable {
     // 오른쪽으로 가는 기능
     public abstract void right();
 
-    // --- 멈춤 관련 (키 뗐을 때) - 여기가 부족했었습니다! ---
-
     // 왼쪽 키에서 손을 뗐을 때 멈추는 기능
     public abstract void left_released();
     

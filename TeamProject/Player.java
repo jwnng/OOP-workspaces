@@ -26,32 +26,30 @@ public class Player implements Moveable {
         character = new JLabel();
         character.setBounds(x, y, width, height);
         
-        startPhysicsLoop();
     }
     
     // ... (setOtherPlayer, startPhysicsLoop 등은 그대로 유지) ...
     public void setOtherPlayer(Player p) { this.otherPlayer = p; }
-    
-    private void startPhysicsLoop() {
-        new Thread(() -> {
-            while (!isDead) {
-                // ... (물리 연산 코드 그대로) ...
-                if (left) xSpeed = -RUN_SPEED;
-                else if (right) xSpeed = RUN_SPEED;
-                else xSpeed = 0;
+    public void update() {
+        if (isDead) return; // 죽었으면 움직이지 않음
 
-                if (up && onGround) { ySpeed = JUMP_POWER; onGround = false; }
-                ySpeed += GRAVITY;
+        // 1. 키 입력에 따른 속도 계산
+        if (left) xSpeed = -RUN_SPEED;
+        else if (right) xSpeed = RUN_SPEED;
+        else xSpeed = 0;
 
-                moveAndCheckCollision();
-                character.setLocation(x, y);
-                try { Thread.sleep(20); } catch (Exception e) {}
-            }
-        }).start();
+        // 2. 점프 및 중력 적용
+        if (up && onGround) { ySpeed = JUMP_POWER; onGround = false; }
+        ySpeed += GRAVITY;
+
+        // 3. 실제 이동 및 벽 충돌 검사
+        moveAndCheckCollision();
+        
+        // 4. 화면에 위치 반영
+        character.setLocation(x, y);
     }
 
-    private void moveAndCheckCollision() {
-        // ... (충돌 코드 그대로 유지) ...
+    private void moveAndCheckCollision() {//충돌 코드
         x += xSpeed;
         if (Collision.isColliding(x, y, width, height)) {
             if (xSpeed > 0) x = ((x + width) / Collision.TILE_SIZE) * Collision.TILE_SIZE - width - 1;
@@ -65,18 +63,8 @@ public class Player implements Moveable {
             else if (ySpeed < 0) { y = (y / Collision.TILE_SIZE) * Collision.TILE_SIZE + Collision.TILE_SIZE; }
             ySpeed = 0;
         }
-
-        // 친구 만남 체크 -> 게임 오버 호출!
-        if (otherPlayer != null) {
-            Rectangle me = new Rectangle(x, y, width, height);
-            Rectangle friend = new Rectangle(otherPlayer.x, otherPlayer.y, width, height);
-            if (me.intersects(friend)) {
-                // MainMap을 통해 게임 오버 화면으로 전환
-                mainMap.gameOver("친구를 만났습니다! 클리어!");
-                isDead = true; // 스레드 종료
             }
-        }
-    }
+   
 
     // Moveable 인터페이스 구현
     @Override public void left() { left = true; }
