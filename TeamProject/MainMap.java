@@ -29,14 +29,14 @@ public class MainMap extends JPanel {
         setBackground(Color.BLACK);
 
         // 1. 이미지 로드
-        wallImage = new ImageIcon("Images/Tile/WoodTile1.png").getImage();
+        wallImage = new ImageIcon("Images/Tile/Wall.png").getImage();
         backgroundImage = new ImageIcon("Images/Background/Background.jpg").getImage();
-        trapGirl = new ImageIcon("Images/Tile/trap_fire.png").getImage();
-        trapDog = new ImageIcon("Images/Tile/trap_water.png").getImage();
+        trapGirl = new ImageIcon("Images/Tile/WoodTile1.png").getImage();
+        trapDog = new ImageIcon("Images/Tile/GlassTile1.png").getImage();
         switchOff = new ImageIcon("Images/Tile/Switch_off.png").getImage();       
         switchOnLeft = new ImageIcon("Images/Tile/Switch_onleft.png").getImage();     
         switchOnRight = new ImageIcon("Images/Tile/switch_onright.png").getImage();
-        doorImg = new ImageIcon("Images/Tile/door.png").getImage();
+        doorImg = new ImageIcon("Images/Tile/door2.png").getImage();
 
         createPlayers(); // 여기서 위치 설정
         
