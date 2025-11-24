@@ -80,25 +80,23 @@ public class MainMap extends JPanel {
     }
 
     // ⭐ [수정] 캐릭터 시작 위치 설정
-    private void createPlayers() {
-        if (p1 != null) remove(p1.character);
-        if (p2 != null) remove(p2.character);
+private void createPlayers() {
+    if (p1 != null) remove(p1.character);
+    if (p2 != null) remove(p2.character);
 
-        // 1. 소녀 (왼쪽 상단)
-        p1 = new Player(this, 64, 64, 1); 
-        setImage(p1, "Images/Girls/Girl_Idle.png");
+    // 소녀 (왼쪽 위)
+    p1 = new Girl(this, 64, 64, null);
 
-        // 2. 강아지 (오른쪽 하단)
-        // 맵 크기가 30칸 x 20칸이므로, 대략 (28*32, 18*32) 위치
-        p2 = new Player(this, 850, 550, 2); 
-        setImage(p2, "Images/Dog/Dog_Idle.png");
+    // 강아지 (오른쪽 아래)
+    p2 = new Dog(this, 850, 550, null);
 
-        p1.setOtherPlayer(p2);
-        p2.setOtherPlayer(p1);
+    p1.setOtherPlayer(p2);
+    p2.setOtherPlayer(p1);
 
-        add(p1.character);
-        add(p2.character);
-    }
+    add(p1.character);
+    add(p2.character);
+}
+
 
     private void setImage(Player p, String path) {
         ImageIcon icon = new ImageIcon(path);
