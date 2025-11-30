@@ -1,11 +1,18 @@
-import java.awt.*;
-import java.awt.event.*;
-import javax.swing.*;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Graphics;
+import java.awt.Image;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.awt.Rectangle; 
+import javax.swing.ImageIcon;
+import javax.swing.JPanel;
+import javax.swing.Timer;
 
 public class MainMap extends JPanel {
-    // ... (변수 선언 등 위쪽 코드는 그대로 유지) ...
     Main main; 
     Player p1, p2;
+    Box pushBox; 
     Timer gameLoop; 
     BgmLoop bgm; 
 
@@ -28,17 +35,23 @@ public class MainMap extends JPanel {
         setLayout(null);
         setBackground(Color.BLACK);
 
-        // 1. 이미지 로드
         wallImage = new ImageIcon("Images/Tile/Wall.png").getImage();
         backgroundImage = new ImageIcon("Images/Background/Background.jpg").getImage();
-        trapGirl = new ImageIcon("Images/Tile/WoodTile1.png").getImage();
-        trapDog = new ImageIcon("Images/Tile/GlassTile1.png").getImage();
+        trapGirl = new ImageIcon("Images/Tile/trap_fire.png").getImage(); 
+        trapDog = new ImageIcon("Images/Tile/trap_water.png").getImage();
         switchOff = new ImageIcon("Images/Tile/Switch_off.png").getImage();       
         switchOnLeft = new ImageIcon("Images/Tile/Switch_onleft.png").getImage();     
         switchOnRight = new ImageIcon("Images/Tile/switch_onright.png").getImage();
-        doorImg = new ImageIcon("Images/Tile/door2.png").getImage();
+        doorImg = new ImageIcon("Images/Tile/door.png").getImage();
 
-        createPlayers(); // 여기서 위치 설정
+        createPlayers(); 
+        
+        // 📦 상자 생성 (위치: (400, 300) - 맵 중간)
+        pushBox = new Box(400, 300); 
+        add(pushBox.boxLabel); 
+
+        add(p1.character);
+        add(p2.character);
         
         setFocusable(true);
         setupKeyListener();
@@ -47,12 +60,17 @@ public class MainMap extends JPanel {
         bgm = new BgmLoop("sound/main_bgm.wav");
         bgm.start();
     }
+    
+    public Box getBox() { return pushBox; }
 
-    // ... (operateSwitch, startGameLoop, checkMeeting 등 중간 코드 유지) ...
+    // ⭐ 스위치 작동 함수 (문 삭제 기능 포함)
     public void operateSwitch(int switchX, int switchY, int targetDoorType, int finalState) {
+        // 1. 스위치 모양 변경
         Collision.tileMap[switchY][switchX] = finalState;
-        for(int row=0; row < Collision.tileMap.length; row++) {
-            for(int col=0; col < Collision.tileMap[0].length; col++) {
+
+        // 2. 맵 전체를 뒤져서 타겟 문 삭제
+        for(int row = 0; row < Collision.tileMap.length; row++) {
+            for(int col = 0; col < Collision.tileMap[0].length; col++) {
                 if(Collision.tileMap[row][col] == targetDoorType) {
                     Collision.tileMap[row][col] = Collision.EMPTY; 
                 }
@@ -66,6 +84,7 @@ public class MainMap extends JPanel {
         gameLoop = new Timer(30, e -> {
             if (p1 != null) p1.update();
             if (p2 != null) p2.update();
+            if (pushBox != null) pushBox.update(); 
             checkMeeting(); 
             repaint();      
         });
@@ -79,33 +98,30 @@ public class MainMap extends JPanel {
         if (r1.intersects(r2)) success(); 
     }
 
-    // ⭐ [수정] 캐릭터 시작 위치 설정
-private void createPlayers() {
-    if (p1 != null) remove(p1.character);
-    if (p2 != null) remove(p2.character);
+    private void createPlayers() {
+        if (p1 != null) remove(p1.character);
+        if (p2 != null) remove(p2.character);
 
-    // 소녀 (왼쪽 위)
-    p1 = new Girl(this, 64, 64, null);
+        // 1. 소녀 (왼쪽 상단)
+        p1 = new Girl(this, null); 
+        setImage(p1, "Images/Girls/Girl_Idle.png");
 
-    // 강아지 (오른쪽 아래)
-    p2 = new Dog(this, 850, 550, null);
+        // 2. 강아지 (오른쪽 하단)
+        p2 = new Dog(this, null); 
+        p2.x = 850; p2.y = 550; 
+        setImage(p2, "Images/Dog/Dog_Idle.png");
 
-    p1.setOtherPlayer(p2);
-    p2.setOtherPlayer(p1);
-
-    add(p1.character);
-    add(p2.character);
-}
-
+        p1.setOtherPlayer(p2);
+        p2.setOtherPlayer(p1);
+    }
 
     private void setImage(Player p, String path) {
         ImageIcon icon = new ImageIcon(path);
-        Image img = icon.getImage().getScaledInstance(50, 50, Image.SCALE_SMOOTH);
+        Image img = icon.getImage().getScaledInstance(p.width, p.height, Image.SCALE_SMOOTH);
         p.character.setIcon(new ImageIcon(img));
-        p.character.setSize(50, 50);
+        p.character.setSize(p.width, p.height);
     }
 
-    // ... (나머지 하단 코드들 그대로 유지) ...
     public void stopGame() {
         if(p1 != null) p1.isDead = true;
         if(p2 != null) p2.isDead = true;
@@ -114,7 +130,12 @@ private void createPlayers() {
 
     public void resetGame() {
         stopGame(); 
+        if(pushBox != null) {
+            pushBox.x = 400; pushBox.y = 300; 
+        }
         createPlayers(); 
+        add(p1.character); 
+        add(p2.character);
         repaint();
         requestFocus();
         startGameLoop();
