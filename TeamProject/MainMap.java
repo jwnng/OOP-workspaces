@@ -19,6 +19,9 @@ public class MainMap extends JPanel {
     Image wallImage, backgroundImage;
     Image trapGirl, trapDog; 
     Image switchOff, switchOnLeft, switchOnRight, doorImg;
+    
+    // ⭐ 추가된 이미지 변수
+    Image breakableWall, switchGreen, switchGreenOn; 
 
     public MainMap(Main main) {
         this.main = main;
@@ -35,19 +38,26 @@ public class MainMap extends JPanel {
         setLayout(null);
         setBackground(Color.BLACK);
 
+        // 1. 이미지 로드
         wallImage = new ImageIcon("Images/Tile/Wall.png").getImage();
         backgroundImage = new ImageIcon("Images/Background/Background.jpg").getImage();
         trapGirl = new ImageIcon("Images/Tile/trap_fire.png").getImage(); 
         trapDog = new ImageIcon("Images/Tile/trap_water.png").getImage();
+        
         switchOff = new ImageIcon("Images/Tile/Switch_off.png").getImage();       
         switchOnLeft = new ImageIcon("Images/Tile/Switch_onleft.png").getImage();     
         switchOnRight = new ImageIcon("Images/Tile/switch_onright.png").getImage();
         doorImg = new ImageIcon("Images/Tile/door.png").getImage();
 
+        // ⭐ 추가 기믹 이미지 (없으면 기존 이미지 재활용)
+        breakableWall = new ImageIcon("Images/Tile/Wall.png").getImage(); 
+        switchGreen = new ImageIcon("Images/Tile/Switch_off.png").getImage(); 
+        switchGreenOn = new ImageIcon("Images/Tile/Switch_onleft.png").getImage(); 
+
         createPlayers(); 
         
-        // 📦 상자 생성 (위치: (400, 300) - 맵 중간)
-        pushBox = new Box(400, 300); 
+        // 📦 상자 생성 (위치: 사라지는 벽 12번 위쪽)
+        pushBox = new Box(800, 250); 
         add(pushBox.boxLabel); 
 
         add(p1.character);
@@ -63,14 +73,10 @@ public class MainMap extends JPanel {
     
     public Box getBox() { return pushBox; }
 
-    // ⭐ 스위치 작동 함수 (문 삭제 기능 포함)
     public void operateSwitch(int switchX, int switchY, int targetDoorType, int finalState) {
-        // 1. 스위치 모양 변경
         Collision.tileMap[switchY][switchX] = finalState;
-
-        // 2. 맵 전체를 뒤져서 타겟 문 삭제
-        for(int row = 0; row < Collision.tileMap.length; row++) {
-            for(int col = 0; col < Collision.tileMap[0].length; col++) {
+        for(int row=0; row < Collision.tileMap.length; row++) {
+            for(int col=0; col < Collision.tileMap[0].length; col++) {
                 if(Collision.tileMap[row][col] == targetDoorType) {
                     Collision.tileMap[row][col] = Collision.EMPTY; 
                 }
@@ -102,11 +108,9 @@ public class MainMap extends JPanel {
         if (p1 != null) remove(p1.character);
         if (p2 != null) remove(p2.character);
 
-        // 1. 소녀 (왼쪽 상단)
         p1 = new Girl(this, null); 
         setImage(p1, "Images/Girls/Girl_Idle.png");
 
-        // 2. 강아지 (오른쪽 하단)
         p2 = new Dog(this, null); 
         p2.x = 850; p2.y = 550; 
         setImage(p2, "Images/Dog/Dog_Idle.png");
@@ -130,9 +134,7 @@ public class MainMap extends JPanel {
 
     public void resetGame() {
         stopGame(); 
-        if(pushBox != null) {
-            pushBox.x = 400; pushBox.y = 300; 
-        }
+        if(pushBox != null) { pushBox.x = 800; pushBox.y = 250; }
         createPlayers(); 
         add(p1.character); 
         add(p2.character);
@@ -196,23 +198,33 @@ public class MainMap extends JPanel {
             for (int col = 0; col < map[0].length; col++) {
                 int tile = map[row][col];
                 
+                // 1. 벽, 발판
                 if (tile == Collision.WALL) g.drawImage(wallImage, col*ts, row*ts, ts, ts, this);
                 else if (tile == Collision.PAD_GIRL) g.drawImage(trapGirl, col*ts, row*ts, ts, ts, this);
                 else if (tile == Collision.PAD_DOG) g.drawImage(trapDog, col*ts, row*ts, ts, ts, this);
                 
-                else if (tile == Collision.SWITCH_RED || tile == Collision.SWITCH_BLUE) {
+                // 2. 사라지는 벽 (일반 벽돌 이미지 사용)
+                else if (tile == Collision.WALL_BREAKABLE) {
+                    g.drawImage(breakableWall, col*ts, row*ts, ts, ts, this);         
+                }
+        
+                // 3. 스위치 (빨강/파랑)
+                else if (tile == Collision.SWITCH_GIRL || tile == Collision.SWITCH_DOG) {
                     g.drawImage(switchOff, col*ts, row*ts, ts, ts, this);
                 }
-                else if (tile == Collision.SWITCH_ON_LEFT) { 
-                    g.drawImage(switchOnLeft, col*ts, row*ts, ts, ts, this);
-                }
-                else if (tile == Collision.SWITCH_ON_RIGHT) { 
-                    g.drawImage(switchOnRight, col*ts, row*ts, ts, ts, this);
-                }
                 
-                else if (tile == Collision.DOOR_RED || tile == Collision.DOOR_BLUE) {
+                // 4. 스위치 켜짐 (공통)
+                else if (tile == Collision.SWITCH_ON_LEFT) g.drawImage(switchOnLeft, col*ts, row*ts, ts, ts, this);
+                else if (tile == Collision.SWITCH_ON_RIGHT) g.drawImage(switchOnRight, col*ts, row*ts, ts, ts, this);
+                
+                // 5. 문
+                else if (tile == Collision.DOOR_GIRL || tile == Collision.DOOR_DOG) {
                     g.drawImage(doorImg, col*ts, row*ts, ts, ts, this);
                 }
+                
+                // 6. 초록 스위치
+                else if (tile == Collision.SWITCH_GREEN) g.drawImage(switchGreen, col*ts, row*ts, ts, ts, this);
+                else if (tile == Collision.SWITCH_GREEN_ON) g.drawImage(switchGreenOn, col*ts, row*ts, ts, ts, this);
             }
         }
     }

@@ -147,21 +147,21 @@ public class Player implements Moveable {
         } 
         
         // 2. 스위치 체크 (빨강)
-        else if (tile == Collision.SWITCH_RED) { 
-            if (xSpeed > 0) mainMap.operateSwitch(tx, ty, Collision.DOOR_RED, Collision.SWITCH_ON_RIGHT);
-            else if (xSpeed < 0) mainMap.operateSwitch(tx, ty, Collision.DOOR_RED, Collision.SWITCH_ON_LEFT);
+        else if (tile == Collision.SWITCH_GIRL) { 
+            if (xSpeed > 0) mainMap.operateSwitch(tx, ty, Collision.DOOR_GIRL, Collision.SWITCH_ON_RIGHT);
+            else if (xSpeed < 0) mainMap.operateSwitch(tx, ty, Collision.DOOR_GIRL, Collision.SWITCH_ON_LEFT);
         }
         else if (tile == Collision.SWITCH_ON_LEFT) { 
-             if (xSpeed > 0) mainMap.operateSwitch(tx, ty, Collision.DOOR_RED, Collision.SWITCH_ON_RIGHT);
+             if (xSpeed > 0) mainMap.operateSwitch(tx, ty, Collision.DOOR_GIRL, Collision.SWITCH_ON_RIGHT);
         }
         else if (tile == Collision.SWITCH_ON_RIGHT) { 
-             if (xSpeed < 0) mainMap.operateSwitch(tx, ty, Collision.DOOR_RED, Collision.SWITCH_ON_LEFT);
+             if (xSpeed < 0) mainMap.operateSwitch(tx, ty, Collision.DOOR_GIRL, Collision.SWITCH_ON_LEFT);
         }
 
         // 3. 스위치 체크 (파랑)
-        else if (tile == Collision.SWITCH_BLUE) { 
-            if (xSpeed > 0) mainMap.operateSwitch(tx, ty, Collision.DOOR_BLUE, Collision.SWITCH_ON_RIGHT);
-            else if (xSpeed < 0) mainMap.operateSwitch(tx, ty, Collision.DOOR_BLUE, Collision.SWITCH_ON_LEFT);
+        else if (tile == Collision.SWITCH_DOG) { 
+            if (xSpeed > 0) mainMap.operateSwitch(tx, ty, Collision.DOOR_DOG, Collision.SWITCH_ON_RIGHT);
+            else if (xSpeed < 0) mainMap.operateSwitch(tx, ty, Collision.DOOR_DOG, Collision.SWITCH_ON_LEFT);
         }
     }
 
