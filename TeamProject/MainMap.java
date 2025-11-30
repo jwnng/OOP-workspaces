@@ -1,13 +1,6 @@
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Graphics;
-import java.awt.Image;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
-import java.awt.Rectangle; 
-import javax.swing.ImageIcon;
-import javax.swing.JPanel;
-import javax.swing.Timer;
+import java.awt.*;
+import java.awt.event.*;
+import javax.swing.*;
 
 public class MainMap extends JPanel {
     Main main; 
@@ -19,8 +12,6 @@ public class MainMap extends JPanel {
     Image wallImage, backgroundImage;
     Image trapGirl, trapDog; 
     Image switchOff, switchOnLeft, switchOnRight, doorImg;
-    
-    // ⭐ 추가된 이미지 변수
     Image breakableWall, switchGreen, switchGreenOn; 
 
     public MainMap(Main main) {
@@ -38,26 +29,23 @@ public class MainMap extends JPanel {
         setLayout(null);
         setBackground(Color.BLACK);
 
-        // 1. 이미지 로드
         wallImage = new ImageIcon("Images/Tile/Wall.png").getImage();
         backgroundImage = new ImageIcon("Images/Background/Background.jpg").getImage();
-        trapGirl = new ImageIcon("Images/Tile/trap_fire.png").getImage(); 
-        trapDog = new ImageIcon("Images/Tile/trap_water.png").getImage();
+        trapGirl = new ImageIcon("Images/Tile/trap_girl.png").getImage(); 
+        trapDog = new ImageIcon("Images/Tile/trap_dog.png").getImage();
         
         switchOff = new ImageIcon("Images/Tile/Switch_off.png").getImage();       
         switchOnLeft = new ImageIcon("Images/Tile/Switch_onleft.png").getImage();     
         switchOnRight = new ImageIcon("Images/Tile/switch_onright.png").getImage();
         doorImg = new ImageIcon("Images/Tile/door.png").getImage();
 
-        // ⭐ 추가 기믹 이미지 (없으면 기존 이미지 재활용)
         breakableWall = new ImageIcon("Images/Tile/Wall.png").getImage(); 
         switchGreen = new ImageIcon("Images/Tile/Switch_off.png").getImage(); 
         switchGreenOn = new ImageIcon("Images/Tile/Switch_onleft.png").getImage(); 
 
         createPlayers(); 
         
-        // 📦 상자 생성 (위치: 사라지는 벽 12번 위쪽)
-        pushBox = new Box(800, 250); 
+        pushBox = new Box(850, 400); 
         add(pushBox.boxLabel); 
 
         add(p1.character);
@@ -134,7 +122,7 @@ public class MainMap extends JPanel {
 
     public void resetGame() {
         stopGame(); 
-        if(pushBox != null) { pushBox.x = 800; pushBox.y = 250; }
+        if(pushBox != null) { pushBox.x = 850; pushBox.y = 400; }
         createPlayers(); 
         add(p1.character); 
         add(p2.character);
@@ -198,31 +186,25 @@ public class MainMap extends JPanel {
             for (int col = 0; col < map[0].length; col++) {
                 int tile = map[row][col];
                 
-                // 1. 벽, 발판
                 if (tile == Collision.WALL) g.drawImage(wallImage, col*ts, row*ts, ts, ts, this);
                 else if (tile == Collision.PAD_GIRL) g.drawImage(trapGirl, col*ts, row*ts, ts, ts, this);
                 else if (tile == Collision.PAD_DOG) g.drawImage(trapDog, col*ts, row*ts, ts, ts, this);
                 
-                // 2. 사라지는 벽 (일반 벽돌 이미지 사용)
-                else if (tile == Collision.WALL_BREAKABLE) {
-                    g.drawImage(breakableWall, col*ts, row*ts, ts, ts, this);         
-                }
-        
-                // 3. 스위치 (빨강/파랑)
+                // ⭐ [수정 완료] SWITCH_GIRL, SWITCH_DOG 사용
                 else if (tile == Collision.SWITCH_GIRL || tile == Collision.SWITCH_DOG) {
                     g.drawImage(switchOff, col*ts, row*ts, ts, ts, this);
                 }
-                
-                // 4. 스위치 켜짐 (공통)
                 else if (tile == Collision.SWITCH_ON_LEFT) g.drawImage(switchOnLeft, col*ts, row*ts, ts, ts, this);
                 else if (tile == Collision.SWITCH_ON_RIGHT) g.drawImage(switchOnRight, col*ts, row*ts, ts, ts, this);
                 
-                // 5. 문
+                // ⭐ [수정 완료] DOOR_GIRL, DOOR_DOG 사용
                 else if (tile == Collision.DOOR_GIRL || tile == Collision.DOOR_DOG) {
                     g.drawImage(doorImg, col*ts, row*ts, ts, ts, this);
                 }
                 
-                // 6. 초록 스위치
+                else if (tile == Collision.WALL_BREAKABLE) {
+                    g.drawImage(breakableWall, col*ts, row*ts, ts, ts, this);         
+                }
                 else if (tile == Collision.SWITCH_GREEN) g.drawImage(switchGreen, col*ts, row*ts, ts, ts, this);
                 else if (tile == Collision.SWITCH_GREEN_ON) g.drawImage(switchGreenOn, col*ts, row*ts, ts, ts, this);
             }
