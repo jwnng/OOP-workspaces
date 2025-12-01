@@ -8,6 +8,7 @@ public class MainMap extends JPanel {
     Player p1, p2;
     Timer gameLoop; 
     BgmLoop bgm; 
+    Box pushBox;
 
     Image wallImage, backgroundImage;
     Image trapGirl, trapDog; 
@@ -38,9 +39,21 @@ public class MainMap extends JPanel {
         doorImg = new ImageIcon("Images/Tile/door2.png").getImage();
 
         createPlayers(); // 여기서 위치 설정
+
+        pushBox = new Box(150, 512); 
+        
+        add(pushBox.boxLabel);
         
         setFocusable(true);
         setupKeyListener();
+
+        addMouseListener(new MouseAdapter() {
+            @Override
+            public void mousePressed(MouseEvent e) {
+                requestFocusInWindow();
+            }
+        });
+
         startGameLoop();
         
         bgm = new BgmLoop("sound/main_bgm.wav");
@@ -64,6 +77,8 @@ public class MainMap extends JPanel {
         gameLoop = new Timer(30, e -> {
             if (p1 != null) p1.update();
             if (p2 != null) p2.update();
+            if (pushBox != null) pushBox.update();
+
             checkMeeting(); 
             repaint();      
         });
@@ -123,6 +138,9 @@ private void createPlayers() {
     	    bgm = new BgmLoop("sound/main_bgm.wav");
     	    bgm.start();
     	}
+
+    public Box getBox() { return pushBox; }
+
     public void gameOver(String reason) {
         if (bgm != null) bgm.stopMusic(); 
         if (main != null) main.triggerGameOver(reason);

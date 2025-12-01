@@ -48,21 +48,76 @@ public class Player implements Moveable {
 
     private void moveAndCheckCollision() {
         x += xSpeed;
+        
+        checkBoxPush(); // 상자 밀기
         if (Collision.isColliding(x, y, width, height)) {
             if (xSpeed > 0) x = ((x + width) / Collision.TILE_SIZE) * Collision.TILE_SIZE - width - 1;
             else if (xSpeed < 0) x = (x / Collision.TILE_SIZE) * Collision.TILE_SIZE + Collision.TILE_SIZE;
             xSpeed = 0;
         }
+        
 
         y += ySpeed;
         onGround = false;
-        if (Collision.isColliding(x, y, width, height)) {
-            if (ySpeed > 0) { onGround = true; y = ((y + height) / Collision.TILE_SIZE) * Collision.TILE_SIZE - height - 1; }
-            else if (ySpeed < 0) { y = (y / Collision.TILE_SIZE) * Collision.TILE_SIZE + Collision.TILE_SIZE; }
+
+        // 세로 이동은 발바닥까지 정확히 체크해야 하므로 원래대로 둡니다.
+        if (Collision.isColliding(x + 5, y, width - 10, height)) {
+            if (ySpeed > 0) { 
+                 onGround = true;
+                 y = ((y + height) / Collision.TILE_SIZE) * Collision.TILE_SIZE - height - 1;
+            } 
+            else if (ySpeed < 0) { 
+                 y = (y / Collision.TILE_SIZE) * Collision.TILE_SIZE + Collision.TILE_SIZE;
+            }
             ySpeed = 0;
         }
 
-        checkGimmicks(); 
+        checkBoxStand(); // 상자 밟기
+        checkGimmicks(); // 스위치/함정 체크
+    }
+
+    private void checkBoxPush() {
+        Box box = mainMap.getBox();
+        if (box == null) return;
+
+        Rectangle myRect = new Rectangle(x, y, width, height);
+        Rectangle boxRect = box.getBounds();
+
+        if (!myRect.intersects(boxRect)) return;
+
+        // 오른쪽으로 밀기
+        if (xSpeed > 0) {
+            if (x + width <= box.x + 10) {
+                box.push(xSpeed);
+
+                // 플레이어와 박스가 겹치지 않도록 위치 보정
+                if (myRect.intersects(boxRect)) {
+                    x = box.x - width - 1;
+                }
+            }
+        }
+        // 왼쪽으로 밀기
+        else if (xSpeed < 0) {
+            if (x >= box.x + box.width - 10) {
+                box.push(xSpeed);
+
+                if (myRect.intersects(boxRect)) {
+                    x = box.x + box.width + 1;
+                }
+            }
+        }
+    }
+
+    private void checkBoxStand() {
+        Box box = mainMap.getBox();
+        if (box == null) return;
+        // 발밑 검사 (폭을 좁게)
+        Rectangle myFeet = new Rectangle(x + 5, y, width - 10, height); 
+        Rectangle boxRect = box.getBounds();
+        if (myFeet.intersects(boxRect)) {
+            if (ySpeed > 0 && y + height <= box.y + 15) { onGround = true; y = box.y - height; ySpeed = 0; }
+            else if (ySpeed < 0 && y >= box.y + box.height - 15) { y = box.y + box.height; ySpeed = 0; }
+        }
     }
 
     private void checkGimmicks() { //기믹 작동

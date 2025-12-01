@@ -45,11 +45,12 @@ public class StartPanel extends JPanel {
         startBtn.setFocusPainted(false);
         startBtn.setBounds(700, 580, 200, 80);
         
+        startBtn.setFocusable(false);
         //버튼클릭 이벤트 (메인맵으로 가는 버튼을 누르면)
         startBtn.addActionListener(e -> {
         	if (startBgm != null) startBgm.stopMusic(); //시작화면 음악 끄기
             cardLayout.show(mainContainer, "GAME"); // 게임 화면으로 전환
-            mainMap.resetGame();
+            mainMap.requestFocusInWindow();      
         });
         add(startBtn);
     }
