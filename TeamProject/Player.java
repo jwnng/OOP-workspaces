@@ -65,7 +65,7 @@ public class Player implements Moveable {
         checkGimmicks(); 
     }
 
-    private void checkGimmicks() {
+    private void checkGimmicks() { //기믹 작동
         int centerX = x + width / 2;
         int centerY = y + height / 2;
         int tx = centerX / Collision.TILE_SIZE;
@@ -78,13 +78,26 @@ public class Player implements Moveable {
         // 1. 발판(함정) 밟으면 리스폰
         if ((tile == Collision.PAD_GIRL && type == 1) || 
             (tile == Collision.PAD_DOG && type == 2)) {
-            respawn(); 
+            dead();
         } 
         
         // 2. 스위치 작동
-        else if (tile == Collision.SWITCH_RED || tile == Collision.SWITCH_BLUE) {
-            int targetDoor = (tile == Collision.SWITCH_RED) ? Collision.DOOR_RED : Collision.DOOR_BLUE;
+        else if (tile == Collision.SWITCH_GIRL || tile == Collision.SWITCH_DOG || tile == Collision.SWITCH_GIRL1 || tile == Collision.SWITCH_DOG1) {
+        	int targetDoor = 0; // 열어야 할 문 번호 저장 변수
+
+            // 어떤 스위치인지 확인해서 짝꿍 문을 지정
+            if (tile == Collision.SWITCH_GIRL) {
+                targetDoor = Collision.DOOR_GIRL;
+            } else if (tile == Collision.SWITCH_DOG) {
+                targetDoor = Collision.DOOR_DOG;
+            } else if (tile == Collision.SWITCH_GIRL1) {
+                targetDoor = Collision.DOOR_GIRL1; // 짝꿍 지정
+            } else if (tile == Collision.SWITCH_DOG1) {
+                targetDoor = Collision.DOOR_DOG1;  // 짝꿍 지정
+            }
+            //스위치 눌린 모양
             int finalState = (xSpeed > 0) ? Collision.SWITCH_ON_RIGHT : Collision.SWITCH_ON_LEFT;
+            //서로 상호작용하는 targetDoor를 없앰
             mainMap.operateSwitch(tx, ty, targetDoor, finalState);
         }
     }

@@ -10,7 +10,7 @@ public class SuccessPanel extends JPanel {
         setBackground(Color.BLACK);
 
         
-        // "SUCCESS!!"
+        // "SUCCESS"
         JLabel titleLabel = new JLabel("SUCCESS!!", SwingConstants.CENTER);
         titleLabel.setFont(new Font("Arial", Font.BOLD, 80));
         titleLabel.setForeground(Color.GREEN);

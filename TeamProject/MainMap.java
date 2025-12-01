@@ -27,8 +27,7 @@ public class MainMap extends JPanel {
         setPreferredSize(new Dimension(mapWidth, mapHeight));
         setLayout(null);
         setBackground(Color.BLACK);
-
-        // 1. 이미지 로드
+        // 이미지 로드
         wallImage = new ImageIcon("Images/Tile/Wall.png").getImage();
         backgroundImage = new ImageIcon("Images/Background/Background.jpg").getImage();
         trapGirl = new ImageIcon("Images/Tile/WoodTile1.png").getImage();
@@ -45,7 +44,6 @@ public class MainMap extends JPanel {
         startGameLoop();
         
         bgm = new BgmLoop("sound/main_bgm.wav");
-        bgm.start();
     }
 
     // ... (operateSwitch, startGameLoop, checkMeeting 등 중간 코드 유지) ...
@@ -79,16 +77,16 @@ public class MainMap extends JPanel {
         if (r1.intersects(r2)) success(); 
     }
 
-    // ⭐ [수정] 캐릭터 시작 위치 설정
+    // 캐릭터 시작 위치 설정
 private void createPlayers() {
     if (p1 != null) remove(p1.character);
     if (p2 != null) remove(p2.character);
 
     // 소녀 (왼쪽 위)
-    p1 = new Girl(this, 64, 64, null);
+    p1 = new Girl(this, 45, 64, null);
 
     // 강아지 (오른쪽 아래)
-    p2 = new Dog(this, 850, 550, null);
+    p2 = new Dog(this, 750, 64, null);
 
     p1.setOtherPlayer(p2);
     p2.setOtherPlayer(p1);
@@ -113,15 +111,18 @@ private void createPlayers() {
     }
 
     public void resetGame() {
-        stopGame(); 
-        createPlayers(); 
-        repaint();
-        requestFocus();
-        startGameLoop();
-        bgm = new BgmLoop("sound/main_bgm.wav");
-        bgm.start();
-    }
-    
+    	    Collision.resetMap(); 
+
+    	    stopGame(); 
+    	    createPlayers(); 
+    	    repaint();
+    	    requestFocus();
+    	    startGameLoop();
+    	    
+    	    //다시 시작 또는 처음 시작 때 불림
+    	    bgm = new BgmLoop("sound/main_bgm.wav");
+    	    bgm.start();
+    	}
     public void gameOver(String reason) {
         if (bgm != null) bgm.stopMusic(); 
         if (main != null) main.triggerGameOver(reason);
@@ -179,7 +180,7 @@ private void createPlayers() {
                 else if (tile == Collision.PAD_GIRL) g.drawImage(trapGirl, col*ts, row*ts, ts, ts, this);
                 else if (tile == Collision.PAD_DOG) g.drawImage(trapDog, col*ts, row*ts, ts, ts, this);
                 
-                else if (tile == Collision.SWITCH_RED || tile == Collision.SWITCH_BLUE) {
+                else if (tile == Collision.SWITCH_GIRL || tile == Collision.SWITCH_DOG || tile == Collision.SWITCH_GIRL1||tile == Collision.SWITCH_DOG1) {
                     g.drawImage(switchOff, col*ts, row*ts, ts, ts, this);
                 }
                 else if (tile == Collision.SWITCH_ON_LEFT) { 
@@ -189,7 +190,7 @@ private void createPlayers() {
                     g.drawImage(switchOnRight, col*ts, row*ts, ts, ts, this);
                 }
                 
-                else if (tile == Collision.DOOR_RED || tile == Collision.DOOR_BLUE) {
+                else if (tile == Collision.DOOR_GIRL || tile == Collision.DOOR_DOG || tile == Collision.DOOR_GIRL1 || tile == Collision.DOOR_DOG1) {
                     g.drawImage(doorImg, col*ts, row*ts, ts, ts, this);
                 }
             }

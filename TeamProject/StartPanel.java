@@ -13,6 +13,7 @@ import javax.swing.JPanel;
 public class StartPanel extends JPanel {
     Image backgroundImage;
     Font myCustomFont;
+    BgmLoop startBgm; //시작 화면 bgm
 
     // 생성자 파라미터 수정: GamePanel -> MainMap
     public StartPanel(CardLayout cardLayout, JPanel mainContainer, MainMap mainMap) {
@@ -20,9 +21,10 @@ public class StartPanel extends JPanel {
         
         // 이미지 경로 수정 (상대 경로)
         backgroundImage = new ImageIcon("Images/Background/FirstBackground.png").getImage(); 
-        
         // 폰트 설정 (없으면 기본 폰트)
         myCustomFont = new Font("Arial", Font.BOLD, 80);
+        startBgm = new BgmLoop("sound/start_bgm.wav"); 
+        startBgm.start();
 
         JLabel titleLabel = new JLabel("Mansion Maze", JLabel.CENTER);
         titleLabel.setFont(myCustomFont);
@@ -42,10 +44,12 @@ public class StartPanel extends JPanel {
         startBtn.setContentAreaFilled(false);
         startBtn.setFocusPainted(false);
         startBtn.setBounds(700, 580, 200, 80);
-
+        
+        //버튼클릭 이벤트 (메인맵으로 가는 버튼을 누르면)
         startBtn.addActionListener(e -> {
+        	if (startBgm != null) startBgm.stopMusic(); //시작화면 음악 끄기
             cardLayout.show(mainContainer, "GAME"); // 게임 화면으로 전환
-            mainMap.requestFocus(); // 키보드 입력 받기 시작
+            mainMap.resetGame();
         });
         add(startBtn);
     }

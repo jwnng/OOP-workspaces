@@ -1,6 +1,7 @@
 import java.awt.CardLayout;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+import java.awt.GridBagLayout;
 
 public class Main extends JFrame {
     private CardLayout cardLayout;
@@ -8,8 +9,8 @@ public class Main extends JFrame {
     
     // 우리가 만든 게임 화면 클래스 이름은 'MainMap'입니다.
     private MainMap mainMap; 
-    private GameOverPanel gameOverPanel;
-    private SuccessPanel successPanel;
+    private GameOverPanel gameOverPanel; //종료화면
+    private SuccessPanel successPanel; //성공화면
     private StartPanel startPanel;
 
     public Main() {
@@ -22,21 +23,21 @@ public class Main extends JFrame {
         cardLayout = new CardLayout();
         mainContainer = new JPanel(cardLayout);
 
-        // 1. 게임 화면 생성
+        //게임 화면 생성
         mainMap = new MainMap(this); // Main을 알려줘서 게임 오버 때 호출하게 함
+        JPanel gameWrapper = new JPanel(new GridBagLayout()); // GridBagLayout은 기본적으로 중앙 정렬을 해줍니다.
+        gameWrapper.add(mainMap); // 래퍼 안에 실제 게임 맵을 넣음
+     
 
-        // 2. 시작 화면 생성
+        //시작 화면 생성
         startPanel = new StartPanel(cardLayout, mainContainer, mainMap);
-
-        // 3. 게임 오버 화면 생성
+        //게임 오버 화면 생성
         gameOverPanel = new GameOverPanel(this);
-        
         //성공 화면 생성
         successPanel=new SuccessPanel(this);
-
         // 카드(화면) 담기
         mainContainer.add(startPanel, "START");
-        mainContainer.add(mainMap, "GAME");
+        mainContainer.add(gameWrapper, "GAME");
         mainContainer.add(gameOverPanel, "GAMEOVER");
         mainContainer.add(successPanel, "SUCCESS");
         add(mainContainer);
