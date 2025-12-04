@@ -225,3 +225,4 @@ public class Player implements Moveable {
     @Override public void dead() { isDead = true; mainMap.gameOver("으악! 죽었습니다."); }
     @Override public void idle() {}
     @Override public void initIndex() {}
+}
